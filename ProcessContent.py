@@ -10,16 +10,21 @@ import re
 _digits = re.compile('\d')
 dictionary_file_name = "dictionary.p"
 articles_file_name = "articles.p"
+word_to_article_file_name = "word_to_article.p"
+article_to_word_file_name = "article_to_word.p"
+
 stemmer = PorterStemmer()
 
 class ArticleEntry:
+    id = 0
     title = ""
     writer = ""
     publication = ""
     dict_0_1 = {}
     dict_count = {}
 
-    def __init__(self, title, writer, publication):
+    def __init__(self, id, title, writer, publication):
+        self.id = id
         self.title = title
         self.writer = writer
         self.publication = publication
@@ -47,6 +52,7 @@ def process_articles(file_name):
     the_dictionary = load_dictionary();
     articles = []
     e = ET.parse(file_name).getroot()
+    id_counter = 0
     for atype in e.findall('item'):
         contents = atype.find('contents/value')
         issue = atype.find('issue/value')
@@ -54,8 +60,9 @@ def process_articles(file_name):
         author = atype.find('author/value')
 
         if issue is not None and title is not None and author is not None and contents is not None:
-            article = ArticleEntry(title.text, author.text, issue.text)
+            article = ArticleEntry(id_counter, title.text, author.text, issue.text)
 
+            id_counter += 1
             soup = BeautifulSoup(contents.text)
             texts = soup.findAll(text=True)
             built_article_dictionary(the_dictionary, article, texts)
@@ -75,9 +82,54 @@ def load_dictionary():
 def test_articles():
     articles = pickle.load(open(articles_file_name, "rb"))
     print len(articles) # 182
+
+    # The type of the articles[78] is ArticleEntry
     print articles[5] # Hong Kong's Umbrella Revolution Isn't Over Yet, LAUREN HILGERS, FEB. 18, 2015
+    print articles[5].id
+    print articles[5].publication
+    print articles[5].title
+    print articles[5].writer
     print articles[5].dict_0_1['hi'] # 1
     print articles[5].dict_count['hi'] # 23
 
+
+# Every word has a collection of documents with 0-1 setting
+def build_bipartite_graph():
+    words = load_dictionary();
+    articles = pickle.load(open(articles_file_name, "rb"))
+
+    article_to_word = {}
+    for article in articles:
+        article_to_word[article.id] = []
+
+    word_to_article = {}
+    for word in words:
+        word_to_article[word] = []
+
+    for word in words:
+        for article in articles:
+            if article.dict_0_1[word] == 1:
+                article_to_word[article.id].append(word)
+                word_to_article[word].append(article.id)
+
+    pickle.dump(word_to_article, open(word_to_article_file_name, "wb"))
+    pickle.dump(article_to_word, open(article_to_word_file_name, "wb"))
+    print "Done Building Word To Article Map"
+    pass
+
+
+def test_build_bipartite_graph():
+    word_to_article_map = pickle.load(open(word_to_article_file_name, "rb"))
+    article_to_word_map = pickle.load(open(article_to_word_file_name, "rb"))
+
+    word = 'unit'
+    print len(word_to_article_map[word])
+    print word_to_article_map[word]
+
+    print len(article_to_word_map[34])
+    pass
+
 # process_articles("NewYorkTimes.xml")
-test_articles()
+# build_bipartite_graph()
+test_build_bipartite_graph()
+# test_articles()
