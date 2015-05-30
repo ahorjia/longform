@@ -44,5 +44,5 @@ def verify_dictionary():
     print len(all_words2)
     pass
 
-# load_file_content("NewYorkTimes.xml")
+load_file_content("NewYorkTimes.xml")
 verify_dictionary()
