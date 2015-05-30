@@ -6,6 +6,7 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem.porter import *
 import pickle
 import re
+from datetime import datetime
 
 _digits = re.compile('\d')
 dictionary_file_name = "dictionary.p"
@@ -62,23 +63,14 @@ def process_articles(file_name):
         title = atype.find('title/value')
         author = atype.find('author/value')
 
-        if issue is None:
-            issue = ""
-        else:
-            issue = issue.text
-
-        if title is None:
-            title = ""
-        else:
-            title = title.text
-
         if author is None:
             author = ""
         else:
             author = author.text
 
         if contents is not None:
-            article = ArticleEntry(id_counter, title, author, issue)
+            issue = try_parsing_date(issue.text)
+            article = ArticleEntry(id_counter, title.text, author, issue)
 
             id_counter += 1
             soup = BeautifulSoup(contents.text)
@@ -86,6 +78,12 @@ def process_articles(file_name):
             built_article_dictionary(the_dictionary, article, texts)
 
             articles.append(article)
+
+    id_counter = 0
+    articles.sort(key=lambda x: x.publication)
+    for article in articles:
+        article.id = id_counter
+        id_counter += 1
 
     print len(articles)
     pickle.dump(articles, open(articles_file_name, "wb"))
@@ -102,16 +100,16 @@ def test_articles():
     articles = pickle.load(open(articles_file_name, "rb"))
     print len(articles) # 339
 
-    # The type of the articles[78] is ArticleEntry
-    print articles[5] # Hong Kong's Umbrella Revolution Isn't Over Yet, LAUREN HILGERS, FEB. 18, 2015
-    print articles[5].id
-    print articles[5].publication
-    print articles[5].title
-    print articles[5].writer
-    print articles[5].dict_0_1['hi'] # 1
-    print articles[5].dict_count['hi'] # 23
-    print len(articles[5].dict_0_1)
-    print len(articles[5].dict_count)
+    article_id = 5
+    print articles[article_id]
+    print articles[article_id].id
+    print articles[article_id].publication
+    print articles[article_id].title
+    print articles[article_id].writer
+    print articles[article_id].dict_0_1['hi'] # 1
+    print articles[article_id].dict_count['hi'] # 23
+    print len(articles[article_id].dict_0_1)
+    print len(articles[article_id].dict_count)
 
     for article in articles:
         print article
@@ -152,7 +150,56 @@ def test_build_bipartite_graph():
     print len(article_to_word_map[34])
     pass
 
-# process_articles("NewYorkTimes.xml")
-# test_articles()
+def find_article_intersection():
+    article1_index = 34
+    article2_index = 76
+
+    words = load_dictionary();
+    articles = pickle.load(open(articles_file_name, "rb"))
+
+    article1 = articles[article1_index]
+    article2 = articles[article2_index]
+    common_count = 0
+
+    for word in words:
+        if article1.dict_0_1.has_key(word) and article2.dict_0_1.has_key(word):
+            common_count += 1
+
+    print common_count
+    pass
+
+
+def try_parsing_date(text):
+    text = text.replace('SEPT.', 'SEP.')
+    for fmt in ('%b. %d, %Y', '%B %d, %Y'):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            pass
+
+    print text
+
+
+def find_articles_with_no_date():
+    all_dates = []
+    articles = pickle.load(open(articles_file_name, "rb"))
+    print len(articles)
+
+    no_date_count = 0
+    for article in articles:
+        # print article
+        if article.publication is None or article.publication == "":
+            no_date_count += 1
+        # dt = article.publication.remove
+        all_dates.append(try_parsing_date(article.publication))
+
+    all_dates.sort()
+    print all_dates
+    # print no_date_count
+
+process_articles("NewYorkTimes.xml")
+test_articles()
 # build_bipartite_graph()
-test_build_bipartite_graph()
+# test_build_bipartite_graph()
+# find_article_intersection()
+# find_articles_with_no_date()
