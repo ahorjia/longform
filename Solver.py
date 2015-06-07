@@ -6,7 +6,7 @@ import scipy
 import scipy.linalg
 from cvxopt import matrix, solvers
 
-file1 = open('U_dump.p', 'rb')
+file1 = open('data_array.p', 'rb')
 U = pickle.load(file1)
 file1.close()
 
@@ -15,7 +15,7 @@ print U.shape
 _, clip_size = U.shape
 
 print clip_size
-threshold = matrix([20.0])
+threshold = matrix([0.1])
 # data = [val * data_multiple for val in data[0:clip_size]]
 data = U
 # print len(data)
@@ -69,7 +69,7 @@ result = sol['x']
 # print sum(result)
 
 resultArray = np.array(result)
-print resultArray
+# print resultArray
 
 print sol['status']
 
@@ -80,6 +80,9 @@ print var
 # Find the closest document
 dot_prod = np.dot(U, result)
 
+# print dot_prod
+values = dot_prod.argsort(axis=0)[-3:][::-1]
+print values
 print np.argmax(dot_prod)
 print "Done!"
 
