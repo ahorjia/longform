@@ -4,15 +4,17 @@ class ArticleEntry:
     title = ""
     writer = ""
     publication = ""
+    content = ""
     dict_0_1 = {}
     dict_count = {}
     dict_article_word_prob = {}
 
-    def __init__(self, id, title, writer, publication):
+    def __init__(self, id, title, writer, publication, content):
         self.id = id
         self.title = title
         self.writer = writer
         self.publication = publication
+        self.content = content
 
     def __unicode__(self):
         return u"{0}, {1}, {2}".format(self.title, self.writer, self.publication)

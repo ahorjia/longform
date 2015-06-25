@@ -9,13 +9,9 @@ import re
 from datetime import datetime
 import time
 from ArticleEntry import ArticleEntry
+from constants import *
 
 _digits = re.compile('\d')
-dictionary_file_name = "dictionary.p"
-articles_file_name = "articles.p"
-word_to_article_file_name = "word_to_article.p"
-article_to_word_file_name = "article_to_word.p"
-mat_coll_file_name = "mat_coll_file.p"
 
 stemmer = PorterStemmer()
 
@@ -59,11 +55,12 @@ def process_articles(file_name):
 
         if contents is not None:
             issue = try_parsing_date(issue.text)
-            article = ArticleEntry(id_counter, title.text, author, issue)
-
             id_counter += 1
             soup = BeautifulSoup(contents.text)
             texts = soup.findAll(text=True)
+
+            article = ArticleEntry(id_counter, title.text, author, issue, texts)
+
             built_article_dictionary(the_dictionary, article, texts)
 
             articles.append(article)
@@ -155,7 +152,7 @@ def find_article_intersection():
     article1_index = 34
     article2_index = 76
 
-    words = load_dictionary();
+    words = load_dictionary()
     articles = pickle.load(open(articles_file_name, "rb"))
 
     article1 = articles[article1_index]
