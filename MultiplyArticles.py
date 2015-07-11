@@ -3,10 +3,7 @@ import numpy as np
 import pickle
 from ArticleEntry import ArticleEntry
 import math
-
-articles_file_name = "articles.p"
-dictionary_file_name = "dictionary.p"
-d_output_file_name = "d_output_file.p"
+from constants import articles_file_name, dictionary_file_name, d_output_file_name
 
 def load_dictionary():
     all_words = pickle.load(open(dictionary_file_name, "rb"))
@@ -76,4 +73,4 @@ def load_d_matrix():
 
     return d_output
 
-load_d_matrix()
+# load_d_matrix()

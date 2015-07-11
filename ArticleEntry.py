@@ -1,4 +1,6 @@
 
+import nltk
+
 class ArticleEntry:
     id = 0
     title = ""
@@ -14,7 +16,8 @@ class ArticleEntry:
         self.title = title
         self.writer = writer
         self.publication = publication
-        self.content = content
+        self.content = unicode.join(u' ', map(unicode, content))
+        self.nltk_text = nltk.Text(nltk.word_tokenize(self.content))
 
     def __unicode__(self):
         return u"{0}, {1}, {2}".format(self.title, self.writer, self.publication)

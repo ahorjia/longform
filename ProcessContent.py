@@ -101,10 +101,12 @@ def test_articles():
 
     print "********************"
     print articles[0]
-    print articles[295]
-    print articles[327]
-    print articles[332]
-    print articles[338]
+    # print articles[0].content
+    print (len(articles[0].content))
+    # print articles[295]
+    # print articles[327]
+    # print articles[332]
+    # print articles[338]
     # print articles[27]
     # print articles[100]
 
