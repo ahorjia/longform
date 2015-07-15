@@ -1,13 +1,13 @@
 __author__ = 'ali.ghorbani'
 
 import pickle
-from constants import articles_file_name
+import constants
 from sklearn.cluster import KMeans
 import numpy as np
 from MultiplyArticles import expand_dictionary, load_dictionary
 
-def cluster_articles() :
-    articles = pickle.load(open(articles_file_name, "rb"))
+def cluster_articles(file_name) :
+    articles = pickle.load(open(file_name, "rb"))
 
     combined_list = []
     all_words = load_dictionary()
@@ -21,9 +21,6 @@ def cluster_articles() :
     print "List Array Shape", list_array.shape
     # cluster_dict = cluster(list_array)
     cluster_hierarchical(list_array, articles)
-
-    # pickle.dump()
-    # print cluster_dict[3]
 
 def cluster_hierarchical(X, articles):
     from scipy.cluster.hierarchy import dendrogram, linkage
@@ -40,9 +37,6 @@ def cluster_hierarchical(X, articles):
                color_threshold=1,
                labels=labels,
                orientation='right')
-
-    # plt.gca().axes.get_xaxis().set_visible(False)
-    # plt.tight_layout()
     plt.show()
 
 def cluster(X):
@@ -66,4 +60,4 @@ def cluster(X):
     return cluster_dict
 
 if __name__ == '__main__':
-    cluster_articles()
+    cluster_articles(constants.thenewyorker_output)

@@ -37,7 +37,7 @@ def built_article_dictionary(the_dictionary, article, texts):
     # print article.dict_article_word_prob
     pass
 
-def process_articles(file_name):
+def process_articles(file_name, output_file_name):
     the_dictionary = load_dictionary();
     articles = []
     e = ET.parse(file_name).getroot()
@@ -54,7 +54,8 @@ def process_articles(file_name):
             author = author.text
 
         if contents is not None:
-            issue = try_parsing_date(issue.text)
+            if issue is not None:
+                issue = try_parsing_date(issue.text)
             id_counter += 1
             soup = BeautifulSoup(contents.text)
             texts = soup.findAll(text=True)
@@ -72,7 +73,7 @@ def process_articles(file_name):
         id_counter += 1
 
     print len(articles)
-    pickle.dump(articles, open(articles_file_name, "wb"))
+    pickle.dump(articles, open(output_file_name, "wb"))
     print "done"
 
 
@@ -82,8 +83,8 @@ def load_dictionary():
     return all_words
 
 
-def test_articles():
-    articles = pickle.load(open(articles_file_name, "rb"))
+def test_articles(output_file_name):
+    articles = pickle.load(open(output_file_name, "rb"))
     print len(articles) # 339
 
     # article_id = 67
@@ -281,10 +282,16 @@ def build_mat_coll(word_to_article_map, word_to_article_prob_norm, article_word_
     print len(mat_coll[sink_word])
     pickle.dump(mat_coll, open(mat_coll_file_name, "wb"))
 
-# process_articles("NewYorkTimes.xml")
-test_articles()
-# build_bipartite_graph()
-# test_build_bipartite_graph()
-# find_article_intersection()
-# find_articles_with_no_date()
-# li_code()
+if __name__ == '__main__':
+    in1 = "pickles/TheNewYorker.xml"
+    out1 = thenewyorker_output
+    process_articles(in1, out1)
+    # process_articles("NewYorkTimes.xml", articles_file_name)
+    # process_articles()
+    test_articles(out1)
+    # build_bipartite_graph()
+    # test_build_bipartite_graph()
+    # find_article_intersection()
+    # find_articles_with_no_date()
+    # li_code()
+    pass

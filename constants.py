@@ -6,4 +6,5 @@ article_to_word_file_name = "pickles/article_to_word.p"
 mat_coll_file_name = "pickles/mat_coll_file.p"
 d_output_file_name = "pickles/d_output_file.p"
 individual_cluster = "pickles/individual_cluster.p"
+thenewyorker_output = "pickles/TheNewYorker.p"
 
