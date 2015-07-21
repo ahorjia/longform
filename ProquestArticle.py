@@ -8,7 +8,7 @@ class ProquestArticle:
         self.full_text = ""
         self.location = ""
         self.narrow_subject = ""
-        self.borad_subject = ""
+        self.broad_subject = ""
         self.people = ""
         self.title = ""
         self.publication_title = ""
@@ -31,6 +31,7 @@ class ProquestArticle:
         self.document_url = ""
         self.last_updated = ""
         self.database = ""
+        self.raw_text = ""
         pass
 
     def __unicode__(self):

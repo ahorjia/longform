@@ -1,8 +1,9 @@
 from collections import defaultdict
 import operator
 import pprint
+from constants import long_form_output
 
-with open("output.json", "r") as dataFile:
+with open(long_form_output, "r") as dataFile:
     data = eval(dataFile.read())
 
 print "Total Row Count", len(data)
