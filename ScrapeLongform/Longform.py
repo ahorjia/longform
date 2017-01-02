@@ -1,46 +1,72 @@
 import time
 
-__author__ = 'ali.ghorbani'
+__author__ = 'agah'
 
-from scrapy import Spider, Item, Field
+from scrapy.selector import Selector
+from scrapy import Spider
+from scrapy import Item, Field
+import string
 
 class LongformEntry(Item):
     title = Field()
     url_address = Field()
-    writer = Field()
+    summary = Field()
+    writers = Field()
+    publication_link = Field()
     publication = Field()
     publication_date = Field()
-
+    reading_time = Field()
+    post_permlink = Field()
 
 class LongformSpider(Spider):
     name = 'Longform'
     allowed_domains = ['longform.org']
 
-    start_urls = ["http://longform.org/posts?page=%d" % d for d in range(1, 540)]
+    start_urls = ["https://www.longform.org/?p=%d&" % d for d in range(1, 2)]
 
+    def cleanList(stringList):
+        return stringList
+        
     def parse(self, response):
         time.sleep(2.0)
 
-        self.log('******A response from %s arrived!' % response.url)
+        print('******A response from %s arrived!' % response.url)
 
         retval = []
-        divs = response.xpath("//div[@class='post ']")
-        for div in divs:
-            url_address = div.xpath("div[@class='content']/h2/a/@href")
-            title = div.xpath("div[@class='content']/h2/a/text()")
-            publication_date = div.xpath("div[@class='content']/div[@class='dateline']"
-                                         "/span[@class='publication_date']/text()")
-            writer = div.xpath("div[@class='content']/div[@class='dateline']/span[@class='byline']/a/text()")
-            publication = div.xpath("div[@class='content']/div[@class='dateline']/span[@class='publication']/a/text()")
+        articles = response.xpath("//article")
+        for article in articles:
+            title = article.xpath(".//h2//text()").extract()
+            url_address = article.xpath("a[@class='post__link']/@href").extract_first()
+            summary = article.xpath("div[@class='post__text post__body']//text()").extract()
+            writers = article.xpath(".//span[@class='post__authors']//text()").extract()
+            publication_link = article.xpath(".//a[@class='post__publication']/@href").extract_first()
+            publication = article.xpath(".//a[@class='post__publication']/text()").extract_first()
+            publication_date = article.xpath(".//span[@class='post__date']/text()").extract_first()
+            reading_time = article.css(".post__duration").xpath(".//text()").extract()
+            post_permlink = article.css(".post__permalink").xpath("@href").extract_first()
+
+            print("=================")
+            print("Title:", title)
+#            print("URL:", url_address)
+#            print("Summary:", summary)
+#            print("Writers:", writers)
+#            print("Publication Link:", publication_link)
+#            print("Publication:", publication)
+#            print("Publication Date:", publication_date)
+#            print("Reading_time:", reading_time)
+#            print("Post Permlink:", post_permlink)
 
             longformentry = LongformEntry(
-                url_address=url_address.extract(),
-                title=title.extract(),
-                publication_date=publication_date.extract(),
-                writer=writer.extract(),
-                publication=publication.extract())
+                title=title,
+                url_address=url_address,
+                summary=summary,
+                writers=writers,
+                publication_link=publication_link,
+                publication=publication,
+                publication_date=publication_date,
+                reading_time=reading_time,
+                post_permlink=post_permlink)
 
             retval.append(longformentry)
 
         return retval
-
