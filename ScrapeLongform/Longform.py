@@ -23,7 +23,7 @@ class LongformSpider(Spider):
     name = 'Longform'
     allowed_domains = ['longform.org']
 
-    start_urls = ["https://www.longform.org/?p=%d&" % d for d in range(2, 3)]
+    start_urls = ["https://www.longform.org/?p=%d&" % d for d in range(1, 344)]
 
     def cleanList(stringList):
         return stringList
