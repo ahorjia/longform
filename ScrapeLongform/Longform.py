@@ -17,6 +17,7 @@ class LongformEntry(Item):
     publication_date = Field()
     reading_time = Field()
     post_permlink = Field()
+    labels = Field()
 
 class LongformSpider(Spider):
     name = 'Longform'
@@ -33,16 +34,31 @@ class LongformSpider(Spider):
         print('******A response from %s arrived!' % response.url)
 
         retval = []
-        #articles = response.xpath("//article")
+        articles = response.xpath("//article")
+        for article in articles:
+            title = article.xpath(".//h2//text()").extract()
+            url_address = article.xpath("a[@class='post__link']/@href").extract_first()
+            summary = article.xpath("div[@class='post__text post__body']//text()").extract()
+            writers = article.xpath(".//span[@class='post__authors']//text()").extract()
+            publication_link = article.xpath(".//a[@class='post__publication']/@href").extract_first()
+            publication = article.xpath(".//a[@class='post__publication']/text()").extract_first()
+            publication_date = article.xpath(".//span[@class='post__date']/text()").extract_first()
+            reading_time = article.css(".post__duration").xpath(".//text()").extract()
+            post_permlink = article.css(".post__permalink").xpath("@href").extract_first()
+            labels = article.xpath(".//p[@class='post__labels']//text()").extract()
 
-        for cnt, div in enumerate(response.xpath("//div[@class='river-header']"), start=1):
-          print("=================")
-          articles = div.xpath('./following-sibling::node()[count(preceding-sibling::div[@class="river-header"])=%d]' % cnt).extract()
+            longformentry = LongformEntry(
+                title=title,
+                url_address=url_address,
+                summary=summary,
+                writers=writers,
+                publication_link=publication_link,
+                publication=publication,
+                publication_date=publication_date,
+                reading_time=reading_time,
+                post_permlink=post_permlink,
+                labels=labels)
 
-          for article in articles:
-            print("*******************")
-            #title = article.xpath(".//h2//text()").extract()
-            #print("Title:", title)
-            print(article)
+            retval.append(longformentry)
 
         return retval
