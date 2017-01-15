@@ -22,7 +22,7 @@ class LongformSpider(Spider):
     name = 'Longform'
     allowed_domains = ['longform.org']
 
-    start_urls = ["https://www.longform.org/?p=%d&" % d for d in range(1, 2)]
+    start_urls = ["https://www.longform.org/?p=%d&" % d for d in range(2, 3)]
 
     def cleanList(stringList):
         return stringList
@@ -33,40 +33,16 @@ class LongformSpider(Spider):
         print('******A response from %s arrived!' % response.url)
 
         retval = []
-        articles = response.xpath("//article")
-        for article in articles:
-            title = article.xpath(".//h2//text()").extract()
-            url_address = article.xpath("a[@class='post__link']/@href").extract_first()
-            summary = article.xpath("div[@class='post__text post__body']//text()").extract()
-            writers = article.xpath(".//span[@class='post__authors']//text()").extract()
-            publication_link = article.xpath(".//a[@class='post__publication']/@href").extract_first()
-            publication = article.xpath(".//a[@class='post__publication']/text()").extract_first()
-            publication_date = article.xpath(".//span[@class='post__date']/text()").extract_first()
-            reading_time = article.css(".post__duration").xpath(".//text()").extract()
-            post_permlink = article.css(".post__permalink").xpath("@href").extract_first()
+        #articles = response.xpath("//article")
 
-            print("=================")
-            print("Title:", title)
-#            print("URL:", url_address)
-#            print("Summary:", summary)
-#            print("Writers:", writers)
-#            print("Publication Link:", publication_link)
-#            print("Publication:", publication)
-#            print("Publication Date:", publication_date)
-#            print("Reading_time:", reading_time)
-#            print("Post Permlink:", post_permlink)
+        for cnt, div in enumerate(response.xpath("//div[@class='river-header']"), start=1):
+          print("=================")
+          articles = div.xpath('./following-sibling::node()[count(preceding-sibling::div[@class="river-header"])=%d]' % cnt).extract()
 
-            longformentry = LongformEntry(
-                title=title,
-                url_address=url_address,
-                summary=summary,
-                writers=writers,
-                publication_link=publication_link,
-                publication=publication,
-                publication_date=publication_date,
-                reading_time=reading_time,
-                post_permlink=post_permlink)
-
-            retval.append(longformentry)
+          for article in articles:
+            print("*******************")
+            #title = article.xpath(".//h2//text()").extract()
+            #print("Title:", title)
+            print(article)
 
         return retval
