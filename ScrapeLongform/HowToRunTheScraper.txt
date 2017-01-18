@@ -1,1 +1,6 @@
 scrapy runspider TheNewYorker.py
+
+scrapy runspider Longform.py -o Side1Result.json
+
+
+Scrape -> Clean the Result ->
